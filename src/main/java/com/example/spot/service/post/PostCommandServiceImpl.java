@@ -27,6 +27,7 @@ public class PostCommandServiceImpl implements PostCommandService {
     private final PostCommentRepository postCommentRepository;
     private final LikedPostCommentRepository likedPostCommentRepository;
     private final MemberScrapRepository memberScrapRepository;
+    private final PostReportRepository postReportRepository;
 
     private final LikedPostQueryService likedPostQueryService;
     private final LikedPostCommentQueryService likedPostCommentQueryService;
@@ -391,5 +392,34 @@ public class PostCommandServiceImpl implements PostCommandService {
                 .build();
     }
 
+    @Transactional
+    @Override
+    public ReportPostResponse reportPost(Long postId) {
+        // 게시글 조회
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new PostHandler(ErrorStatus._POST_NOT_FOUND));
+
+        Long currentMemberId = getCurrentUserId();
+
+        // 회원 정보 가져오기
+        Member member = memberRepository.findById(currentMemberId)
+                .orElseThrow(() -> new MemberHandler(ErrorStatus._MEMBER_NOT_FOUND));
+
+
+        // 해당 게시글 신고 여부
+        if (postReportRepository.findByMemberIdAndPostId(currentMemberId, postId).isPresent()) {
+            throw new PostHandler(ErrorStatus._POST_ALREADY_REPORTED);
+        }
+
+        // 신고 정보 저장
+        PostReport postReport = new PostReport(post, member);
+        postReportRepository.saveAndFlush(postReport);
+
+        return ReportPostResponse.builder()
+                .postId(post.getId())
+                .title(post.getTitle())
+                .build();
+
+    }
 
 }
