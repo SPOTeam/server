@@ -6,10 +6,7 @@ import com.example.spot.domain.Post;
 import com.example.spot.domain.PostComment;
 import com.example.spot.domain.enums.Board;
 import com.example.spot.domain.mapping.MemberScrap;
-import com.example.spot.repository.MemberRepository;
-import com.example.spot.repository.MemberScrapRepository;
-import com.example.spot.repository.PostCommentRepository;
-import com.example.spot.repository.PostRepository;
+import com.example.spot.repository.*;
 import com.example.spot.web.dto.post.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -32,6 +29,7 @@ public class PostQueryServiceImpl implements PostQueryService {
     private final PostCommentRepository postCommentRepository;
     private final LikedPostCommentQueryService likedPostCommentQueryService;
     private final MemberScrapRepository memberScrapRepository;
+    private final PostReportRepository postReportRepository;
 
 
     @Transactional
@@ -40,11 +38,6 @@ public class PostQueryServiceImpl implements PostQueryService {
         // 게시글 단건 조회
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostHandler(ErrorStatus._POST_NOT_FOUND));
-
-        // 게시글이 신고되었는지 확인 - 수정 예정
-//        if (isPostReported(post)) {
-//            throw new PostHandler(ErrorStatus._POST_REPORTED);
-//        }
 
         // 조회수 증가
         post.viewHit();
@@ -65,8 +58,11 @@ public class PostQueryServiceImpl implements PostQueryService {
         //댓글
         CommentResponse commentResponse = getCommentsByPostId(post.getId());
 
+        // 게시글 신고 여부
+        boolean reported = postReportRepository.existsByPostId(postId);
+
         // 조회된 게시글을 PostSingleResponse로 변환하여 반환
-        return PostSingleResponse.toDTO(post, likeCount, scrapCount, commentResponse, likedByCurrentUser, scrapedByCurrentUser);
+        return PostSingleResponse.toDTO(post, likeCount, scrapCount, commentResponse, likedByCurrentUser, scrapedByCurrentUser, reported);
     }
 
     @Transactional(readOnly = true)

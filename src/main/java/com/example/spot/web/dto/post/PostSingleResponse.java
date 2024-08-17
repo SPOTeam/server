@@ -82,7 +82,7 @@ public class PostSingleResponse {
             description = "신고 여부입니다.",
             format = "boolean"
     )
-    private boolean isReported;
+    private boolean reported;
 
     public Board getType() {
         return Board.findByValue(type);
@@ -96,7 +96,7 @@ public class PostSingleResponse {
         return writer;
     }
 
-    public static PostSingleResponse toDTO(Post post, long likeCount, long scrapCount, CommentResponse commentResponse, boolean likedByCurrentUser, boolean scrapedByCurrentUser) {
+    public static PostSingleResponse toDTO(Post post, long likeCount, long scrapCount, CommentResponse commentResponse, boolean likedByCurrentUser, boolean scrapedByCurrentUser, boolean reported) {
         // 작성자가 익명인지 확인하여 작성자 이름 설정
         String writerName = judgeAnonymous(post.isAnonymous(), post.getMember().getName());
 
@@ -113,6 +113,7 @@ public class PostSingleResponse {
                 .commentCount(commentResponse.getComments().size())
                 .viewCount(post.getHitNum())
                 .commentResponses(commentResponse)
+                .reported(reported)
                 .build();
     }
 }
