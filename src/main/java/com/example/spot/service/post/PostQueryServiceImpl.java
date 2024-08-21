@@ -107,9 +107,9 @@ public class PostQueryServiceImpl implements PostQueryService {
     }
 
     // 게시글이 신고되었는지 확인하는 메서드
-    private boolean isPostReported(Post post) {
-        return !post.getPostReportList().isEmpty();
-    }
+//    private boolean isPostReported(Post post) {
+//        return !post.getPostReportList().isEmpty();
+//    }
 
     @Transactional(readOnly = true)
     @Override

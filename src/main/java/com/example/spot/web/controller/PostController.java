@@ -6,6 +6,7 @@ import com.example.spot.service.post.PostCommandService;
 import com.example.spot.service.post.PostQueryService;
 import com.example.spot.validation.annotation.ExistMember;
 import com.example.spot.validation.annotation.ExistPost;
+import com.example.spot.validation.annotation.ExistPostComment;
 import com.example.spot.web.dto.post.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -162,7 +163,7 @@ public class PostController {
                     description = "삭제할 게시글의 ID입니다.",
                     schema = @Schema(type = "integer", format = "int64")
             )
-            @PathVariable Long postId
+            @PathVariable @ExistPost Long postId
     ) {
         postCommandService.deletePost(memberId, postId);
         return ApiResponse.onSuccess(SuccessStatus._NO_CONTENT);
@@ -232,7 +233,7 @@ public class PostController {
     @Operation(summary = "[게시판] 댓글 좋아요 API", description = "댓글 ID와 회원 ID를 받아 댓글에 좋아요를 추가합니다.")
     @PostMapping("/comments/{commentId}/{memberId}/like")
     public ApiResponse<CommentLikeResponse> likeComment(
-            @PathVariable Long commentId,
+            @PathVariable @ExistPostComment Long commentId,
             @PathVariable @ExistMember Long memberId) {
         CommentLikeResponse response = postCommandService.likeComment(commentId, memberId);
         return ApiResponse.onSuccess(SuccessStatus._OK, response);
@@ -242,7 +243,7 @@ public class PostController {
     @Operation(summary = "[게시판] 댓글 좋아요 취소 API", description = "댓글 ID와 회원 ID를 받아 댓글에 좋아요를 취소합니다.")
     @DeleteMapping("/comments/{commentId}/{memberId}/like")
     public ApiResponse<CommentLikeResponse> cancelCommentLike(
-            @PathVariable Long commentId,
+            @PathVariable @ExistPostComment Long commentId,
             @PathVariable @ExistMember Long memberId) {
         CommentLikeResponse response = postCommandService.cancelCommentLike(commentId, memberId);
         return ApiResponse.onSuccess(SuccessStatus._NO_CONTENT, response);
@@ -253,7 +254,7 @@ public class PostController {
     @Operation(summary = "[게시판] 댓글 싫어요 API", description = "댓글 ID와 회원 ID를 받아 댓글에 싫어요를 추가합니다.")
     @PostMapping("/comments/{commentId}/{memberId}/dislike")
     public ApiResponse<CommentLikeResponse> dislikeComment(
-            @PathVariable Long commentId,
+            @PathVariable @ExistPostComment Long commentId,
             @PathVariable @ExistMember Long memberId) {
         CommentLikeResponse response = postCommandService.dislikeComment(commentId, memberId);
         return ApiResponse.onSuccess(SuccessStatus._OK, response);
@@ -263,7 +264,7 @@ public class PostController {
     @Operation(summary = "[게시판] 댓글 싫어요 취소 API", description = "댓글 ID와 회원 ID를 받아 댓글에 싫어요를 취소합니다.")
     @DeleteMapping("/comments/{commentId}/{memberId}/dislike")
     public ApiResponse<CommentLikeResponse> cancelCommentDislike(
-            @PathVariable Long commentId,
+            @PathVariable @ExistPostComment Long commentId,
             @PathVariable @ExistMember Long memberId) {
         CommentLikeResponse response = postCommandService.cancelCommentDislike(commentId, memberId);
         return ApiResponse.onSuccess(SuccessStatus._NO_CONTENT, response);
